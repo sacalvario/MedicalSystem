@@ -10,64 +10,85 @@ using MahApps.Metro.Controls;
 
 using MedicalSystem.Contracts.Services;
 using MedicalSystem.Properties;
+using ModernWpf.Controls;
 
 namespace MedicalSystem.ViewModels
 {
     public class ShellViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
-        private HamburgerMenuItem _selectedMenuItem;
-        private RelayCommand _goBackCommand;
+        //private IEcnDataService _ecnDataService;
+        //private ILoginWindow _loginWindow;
+        private NavigationViewItem _selectedMenuItem;
         private ICommand _menuItemInvokedCommand;
-        private ICommand _loadedCommand;
-        private ICommand _unloadedCommand;
+        private ICommand _signOutCommand;
 
-        public HamburgerMenuItem SelectedMenuItem
+        //public string Name => UserRecord.Employee.EmployeeFirstName + " " + UserRecord.Employee.EmployeeLastName;
+        //public string Department => UserRecord.Employee.Department.DepartmentName;
+
+        //private bool _Holidays;
+        //public bool Holidays
+        //{
+        //    get => _Holidays;
+        //    set
+        //    {
+        //        if (_Holidays != value)
+        //        {
+        //            _Holidays = value;
+        //            RaisePropertyChanged("Holidays");
+
+        //            if (_Holidays)
+        //            {
+        //                _ = _ecnDataService.SetHolidays(UserRecord.Employee);
+        //            }
+        //            else
+        //            {
+        //                _ = _ecnDataService.RemoveHolidays(UserRecord.Employee);
+        //            }
+        //        }
+        //    }
+        //}
+
+        public NavigationViewItem SelectedMenuItem
         {
-            get { return _selectedMenuItem; }
-            set { Set(ref _selectedMenuItem, value); }
+            get => _selectedMenuItem;
+            set => Set(ref _selectedMenuItem, value);
         }
 
-        // TODO WTS: Change the icons and titles for all HamburgerMenuItems here.
-        public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
-        {
-            new HamburgerMenuGlyphItem() { Label = Resources.ShellMainPage, Glyph = "\uE8A5", TargetPageType = typeof(MainViewModel) },
-            new HamburgerMenuGlyphItem() { Label = Resources.ShellListDetailsPage, Glyph = "\uE8A5", TargetPageType = typeof(ListDetailsViewModel) },
-            new HamburgerMenuGlyphItem() { Label = Resources.ShellContentGridPage, Glyph = "\uE8A5", TargetPageType = typeof(ContentGridViewModel) },
-            new HamburgerMenuGlyphItem() { Label = Resources.ShellDataGridPage, Glyph = "\uE8A5", TargetPageType = typeof(DataGridViewModel) },
-        };
+        public ICommand MenuItemInvokedCommand => _menuItemInvokedCommand ??= new RelayCommand(OnMenuItemInvoked);
+        public ICommand SignOutCommand => _signOutCommand ??= new RelayCommand(SignOut);
 
-        public RelayCommand GoBackCommand => _goBackCommand ?? (_goBackCommand = new RelayCommand(OnGoBack, CanGoBack));
 
-        public ICommand MenuItemInvokedCommand => _menuItemInvokedCommand ?? (_menuItemInvokedCommand = new RelayCommand(OnMenuItemInvoked));
-
-        public ICommand LoadedCommand => _loadedCommand ?? (_loadedCommand = new RelayCommand(OnLoaded));
-
-        public ICommand UnloadedCommand => _unloadedCommand ?? (_unloadedCommand = new RelayCommand(OnUnloaded));
+        //private Visibility _ApprovedECNSVisibility = Visibility.Collapsed;
+        //public Visibility ApprovedECNSVisibility
+        //{
+        //    get => _ApprovedECNSVisibility;
+        //    set
+        //    {
+        //        if (_ApprovedECNSVisibility != value)
+        //        {
+        //            _ApprovedECNSVisibility = value;
+        //            RaisePropertyChanged("ApprovedECNSVisibility");
+        //        }
+        //    }
+        //}
 
         public ShellViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
+            //_ecnDataService = ecnDataService;
+            //Holidays = Convert.ToBoolean(UserRecord.Employee.EmployeeHolidays);
+
+            //if (UserRecord.Employee_ID == 3806)
+            //{
+            //    ApprovedECNSVisibility = Visibility.Visible;
+            //}
         }
-
-        private void OnLoaded()
-        {
-            _navigationService.Navigated += OnNavigated;
-        }
-
-        private void OnUnloaded()
-        {
-            _navigationService.Navigated -= OnNavigated;
-        }
-
-        private bool CanGoBack()
-            => _navigationService.CanGoBack;
-
-        private void OnGoBack()
-            => _navigationService.GoBack();
 
         private void OnMenuItemInvoked()
-            => NavigateTo(SelectedMenuItem.TargetPageType);
+        {
+            NavigateTo(SelectedMenuItem.SetTargetPageType());
+        }
 
         private void NavigateTo(Type targetViewModel)
         {
@@ -77,17 +98,20 @@ namespace MedicalSystem.ViewModels
             }
         }
 
-        private void OnNavigated(object sender, string viewModelName)
+        private async void SignOut()
         {
-            var item = MenuItems
-                        .OfType<HamburgerMenuItem>()
-                        .FirstOrDefault(i => viewModelName == i.TargetPageType?.FullName);
-            if (item != null)
-            {
-                SelectedMenuItem = item;
-            }
+            //if (Application.Current.Windows.OfType<ILoginWindow>().Count() == 0)
+            //{
+            //    _navigationService.UnsubscribeNavigation();
+            //    _loginWindow = SimpleIoc.Default.GetInstance<ILoginWindow>(Guid.NewGuid().ToString());
+            //    _navigationService.Initialize(_loginWindow.GetNavigationFrame());
+            //    Messenger.Default.Send(new NotificationMessage("CloseWindow"));
+            //    ViewModelLocator.UnregisterShellViewModel();
+            //    _loginWindow.ShowWindow();
+            //    _navigationService.NavigateTo(typeof(LoginViewModel).FullName, _loginWindow);
 
-            GoBackCommand.RaiseCanExecuteChanged();
+            //    await System.Threading.Tasks.Task.CompletedTask;
+            //}
         }
     }
 }
